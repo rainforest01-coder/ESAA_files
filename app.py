@@ -16,9 +16,10 @@ genai.configure(api_key=GEMINI_API_KEY)
 # ⚙️ [백엔드 기능 코드 - 유튜브 분석용]
 # ==========================================
 
-# [1단계] URL 파싱 (Video ID 추출)
+# [1단계] URL 파싱 (일반 영상 및 쇼츠 Video ID 모두 추출 가능)
 def extract_video_id(url):
-    regex = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})'
+    # 정규표현식에 shorts\/ 패턴을 추가하여 쇼츠 주소도 완벽히 대응합니다.
+    regex = r'(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|shorts\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})'
     match = re.search(regex, url)
     return match.group(1) if match else None
 
