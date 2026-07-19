@@ -161,8 +161,8 @@ def analyze_with_gemini(youtube_data):
                 "  - 다만 온라인 콘텐츠의 특성을 고려하여, 세부적인 사실관계는 참고용으로 수용하는 것이 바람직합니다."
             )
         beautiful_result.append(
-            f"## 📊 콘텐츠 선동성 분석 점수\n\n"
-            f"## **【 {score} / 100 점 】 {level}**\n")
+            f"### 📊 콘텐츠 선동성 분석 점수\n\n"
+            f"#### **{score} / 100 점** {level}\n")
     else:
         beautiful_result.append("📊  콘텐츠 선동성 분석 점수  【 측정 불가 】\n")
         
