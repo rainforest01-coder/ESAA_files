@@ -76,8 +76,6 @@ def analyze_with_gemini(youtube_data):
 
 중요
 
-중요
-
 단순한 클릭 유도 표현이나 일반적인 마케팅 문구만으로
 선동성이 높다고 판단하지 마세요.
 
