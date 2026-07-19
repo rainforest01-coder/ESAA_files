@@ -4,10 +4,10 @@ import pandas as pd
 import re
 import google.generativeai as genai
 from googleapiclient.discovery import build
-import os
+import streamlit as st
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
+GEMINI_API_KEY = st.secrets["GEMINI_API_KEY"]
+YOUTUBE_API_KEY = st.secrets["YOUTUBE_API_KEY"]
 
 # 제미나이 API 설정 초기화
 genai.configure(api_key=GEMINI_API_KEY)
