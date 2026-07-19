@@ -134,7 +134,6 @@ def analyze_with_gemini(youtube_data):
     raw_text = response.text
     
     beautiful_result = []
-    beautiful_result.append("📊 콘텐츠 분석 결과 ")
     
     # 1. 점수 파싱 및 위험도 이모지 추가
     score_match = re.search(r"점수:\s*(\d+)", raw_text)
@@ -161,7 +160,9 @@ def analyze_with_gemini(youtube_data):
                 "  - 본 콘텐츠는 과도한 감정 자극이나 왜곡적 표현의 비중이 낮아 상대적으로 객관성을 유지하고 있는 것으로 분석됩니다.\n"
                 "  - 다만 온라인 콘텐츠의 특성을 고려하여, 세부적인 사실관계는 참고용으로 수용하는 것이 바람직합니다."
             )
-        beautiful_result.append(f"📊  콘텐츠 선동성 분석 점수  【 {score} / 100 점 】 ({level})\n")
+        beautiful_result.append(
+            f"## 📊 콘텐츠 선동성 분석 점수\n\n"
+            f"## **【 {score} / 100 점 】 {level}**\n")
     else:
         beautiful_result.append("📊  콘텐츠 선동성 분석 점수  【 측정 불가 】\n")
         
