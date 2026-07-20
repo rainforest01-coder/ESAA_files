@@ -314,11 +314,15 @@ with tab1:
                 type_desc = "평소 뉴스를 이용할 때 출처 확인과 교차 검증을 함께 하면 더욱 신뢰도 높은 정보 이용에 도움이 됩니다."
                 alert_style = st.warning
 
-        # 취약성 점수 산출
-        risk_factor = (1.5 * g3_thumbnail_flag) + (1.0 * g4_5_val) + (3.0 if "대체로 믿습니다" in q6_score else 0.0)
-        q7_map = {"항상 교차 검증을 해본다": 4, "자주 해보는 편이다": 3, "가끔 생각나면 한다": 2, "거의 하지 않는다": 1, "단 한 번도 해본 적 없다": 0}
+        # 2) 취약성 점수 산출 (7개 고유 문항을 교차 결합한 종합 지수 연산)
+        # 위험(+) 요인
+        risk_factor = (1.5 * g3_thumbnail_flag) + (1.0 * g4_5_val) + (3.0 if "예, 대체로 신뢰" in q6_score else 0.0)
+        
+        # 방어(-) 요인
+        q7_map = {"항상 교차 검증을 수행한다": 4, "자주 수행하는 편이다": 3, "가끔 생각나면 수행한다": 2, "거의 수행하지 않는다": 1, "단 한 번도 해본 적 없다": 0}
         defense_factor = (1.2 * g11_val) + (1.5 * g12_val) + (1.5 * q7_map[q7_score])
 
+        # MinMaxScaler 정규화 (이론상 미니맥스 범위를 기반으로 0~100 스케일링)
         raw_score = risk_factor - defense_factor
         min_val, max_val = -19.5, 6.5
         scaled_score = ((raw_score - min_val) / (max_val - min_val)) * 100
