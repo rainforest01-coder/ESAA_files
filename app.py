@@ -315,7 +315,7 @@ with tab1:
                 improve_desc = "타인에게 공유하기 전에, 해당 내용이 사실인지 다른 언론사의 보도와 비교해 본 뒤 공유해 주세요."
                 alert_style = st.error
             else:
-                user_type = "일반 이용형"
+                user_type = "일반 저확인 이용형"
                 type_desc = "평소 뉴스를 이용할 때 출처 확인과 교차 검증을 함께 하면 더욱 신뢰도 높은 정보 이용에 도움이 됩니다."
                 improve_desc = "알고리즘이 추천하거나 눈에 띄는 뉴스 외에도, 관심 있는 이슈를 직접 검색하여 다양한 언론사의 시각을 균형 있게 보세요."
                 alert_style = st.warning
