@@ -287,94 +287,68 @@ with tab1:
         g4_5_map = {"① 전혀 하지 않는다": 1, "② 거의 하지 않는다": 2, "③ 보통이다": 3, "④ 자주 한다": 4, "⑤ 매우 자주 한다":5}
         g4_5_val = g4_5_map[q5_g4_5]
 
-        # 유형 판별 조건 작동 (취약층 전반으로 문구 톤 수정)
+        # 1) 유형 판별 조건 및 유형별 맞춤형 개선점 정의 (모순 원천 차단)
         if target_value == 0:
             user_type = "비판적 이용형"
             type_desc = "출처를 확인하고 다른 언론 보도와 비교하는 습관이 비교적 잘 형성되어 있습니다."
+            improve_desc = "현재의 훌륭한 출처 확인 및 교차 검증 습관을 꾸준히 유지하시면 미디어 허위 정보로부터 가장 안전합니다."
             alert_style = st.success
         else:
             if q1_age >= 60:
                 user_type = "출처 확인 지원 필요형"
-                type_desc= "뉴스를 이용할 때 출처를 확인하는 습관을 조금 더 기르면 정보의 신뢰성을 판단하는 데 도움이 됩니다."
+                type_desc = "뉴스를 이용할 때 출처를 확인하는 습관을 조금 더 기르면 정보의 신뢰성을 판단하는 데 도움이 됩니다."
+                improve_desc = "뉴스를 보실 때 제목뿐만 아니라 상단이나 하단에 적힌 '언론사 이름'을 먼저 확인하는 연습부터 시작해 보세요."
                 alert_style = st.warning
             elif g3_thumbnail_flag == 1:
                 user_type = "썸네일 중심 이용형"
                 type_desc = "제목이나 썸네일의 영향을 비교적 크게 받는 뉴스 이용 패턴을 보입니다. 눈길을 사로잡는 낚시성 헤드라인에 넘어가지 않게 주의가 필요합니다."                
+                improve_desc = "자극적인 제목이나 이미지에 이끌려 뉴스를 클릭했을 때는, 본문으로 들어가기 전 공신력 있는 언론사의 보도인지 한 번 더 확인하는 습관이 필요합니다."
                 alert_style = st.error
             elif g11_val in [1, 2]:
                 user_type = "출처 확인 미흡형"
                 type_desc = "뉴스를 이용할 때 언론사와 출처를 함께 확인하는 습관을 권장합니다."
+                improve_desc = "내가 보고 있는 뉴스를 만든 곳이 어디인지 확인하고, 포털 사이트 등에 해당 뉴스 제목을 검색해 교차 검증을 해보는 것이 좋습니다."
                 alert_style = st.error
             elif g4_5_val in [4, 5]:
                 user_type = "공유 빈도 높은 이용형"
-                type_desc = "뉴스를 공유하기 전에 다른 언론사의 보도와 함께 확인하면 정보의 신뢰성을 높일 수 있습니다."
+                type_desc = "뉴스를 다른 곳으로 공유하는 빈도가 높으나, 공유 전 검증 단계가 보완될 필요가 있습니다."
+                improve_desc = "좋은 정보라고 느껴져 타인에게 공유하기 전에, 해당 내용이 사실인지 다른 언론사의 보도와 최소 1회 이상 비교해 본 뒤 공유해 주세요."
                 alert_style = st.error
             else:
                 user_type = "일반 이용형"
                 type_desc = "평소 뉴스를 이용할 때 출처 확인과 교차 검증을 함께 하면 더욱 신뢰도 높은 정보 이용에 도움이 됩니다."
+                improve_desc = "알고리즘이 추천하거나 눈에 띄는 뉴스 외에도, 관심 있는 이슈를 직접 검색하여 다양한 언론사의 시각을 균형 있게 섭취해 보세요."
                 alert_style = st.warning
 
-        # 2) 취약성 점수 산출 (7개 고유 문항을 교차 결합한 종합 지수 연산)
-        # 위험(+) 요인
+        # 2) 취약성 점수 산출
         risk_factor = (1.5 * g3_thumbnail_flag) + (1.0 * g4_5_val) + (3.0 if "예, 대체로 신뢰" in q6_score else 0.0)
-        
-        # 방어(-) 요인
         q7_map = {"항상 교차 검증을 수행한다": 4, "자주 수행하는 편이다": 3, "가끔 생각나면 수행한다": 2, "거의 수행하지 않는다": 1, "단 한 번도 해본 적 없다": 0}
         defense_factor = (1.2 * g11_val) + (1.5 * g12_val) + (1.5 * q7_map[q7_score])
 
-        # MinMaxScaler 정규화 (이론상 미니맥스 범위를 기반으로 0~100 스케일링)
         raw_score = risk_factor - defense_factor
         min_val, max_val = -19.5, 6.5
         scaled_score = ((raw_score - min_val) / (max_val - min_val)) * 100
         vulnerability_index = round(np.clip(scaled_score, 0, 100), 1)
 
-        # 결과 출력 (직관성 보완 버전)
+        # 결과 출력 (점수대별로는 '상태 레이블'만 정의하고, 문구는 위에서 결정된 값을 사용)
         st.subheader("📊 진단 결과")
         
-                # 점수 대역별 상태 정의
         if vulnerability_index >= 70:
             status_label = "🚨 위험"
-            improve_desc = (
-                "뉴스를 공유하기 전 출처를 확인하고, 다른 언론사의 보도와 함께 비교해 보는 습관을 권장합니다."
-            )
-
         elif vulnerability_index >= 40:
             status_label = "⚠️ 주의"
-            improve_desc = (
-                "제목이나 썸네일만으로 판단하기보다, 다른 언론사의 보도도 함께 확인하면 더욱 신뢰도 높은 정보 이용에 도움이 됩니다."
-            )
-
         else:
             status_label = "✅ 안전"
-            improve_desc = (
-                "현재의 출처 확인 및 교차 검증 습관을 유지하면 신뢰도 높은 뉴스 이용에 도움이 됩니다."
-            )
 
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.metric(
-                label="미디어 정보 확인 지수",
-                value=f"{vulnerability_index}점",
-                delta=status_label,
-                delta_color="off"
-            )
-
-        with col2:
-            st.metric(
-                label="뉴스 이용 유형",
-                value=user_type
-            )
-
-        st.progress(int(vulnerability_index))
+        # 화면에 모순 없이 이쁘게 뿌려주기
+        alert_style(f"**[{status_label}] 귀하의 미디어 취약성 유형은 [{user_type}] 입니다.**")
+        st.markdown(f"**📌 이용 특성:** {type_desc}")
+        st.markdown(f"**💡 개선하면 좋은 점:** {improve_desc}")
 
         st.caption(
             "※ 본 결과는 뉴스 이용 습관과 출처 확인 행동을 바탕으로 산출된 참고용 분석 결과입니다."
         )
 
-        st.info(f"**📌 이용 특성**\n\n{type_desc}")
-
-        st.warning(f"**💡 개선하면 좋은 점**\n\n{improve_desc}")
 
 # ------------------------------------------------------------------------------
 # 탭 2: 유튜브 실시간 위험성 검증
