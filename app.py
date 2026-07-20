@@ -331,6 +331,7 @@ with tab1:
         vulnerability_index = round(np.clip(scaled_score, 0, 100), 1)
 
         # 결과 출력 (점수대별로는 '상태 레이블'만 정의하고, 문구는 위에서 결정된 값을 사용)
+        # 결과 출력 (기존 메트릭 레이아웃 완벽 유지 + 모순 없는 텍스트 결합)
         st.subheader("📊 진단 결과")
         
         if vulnerability_index >= 70:
@@ -340,8 +341,30 @@ with tab1:
         else:
             status_label = "✅ 안전"
 
-        # 화면에 모순 없이 이쁘게 뿌려주기
-        alert_style(f"**[{status_label}] 귀하의 미디어 취약성 유형은 [{user_type}] 입니다.**")
+        # 사용자가 마음에 들어 하신 메트릭 레이아웃 유지
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric(
+                label="미디어 정보 확인 지수",
+                value=f"{vulnerability_index}점",
+                delta=status_label,
+                delta_color="off"
+            )
+
+        with col2:
+            st.metric(
+                label="뉴스 이용 유형",
+                value=user_type
+            )
+
+        # 프로그레스 바 유지 (int 변환 안정성 확보를 위해 clip 처리)
+        st.progress(int(np.clip(vulnerability_index, 0, 100)))
+        
+        st.markdown("---") # 시각적 구분을 위한 구분선 추가
+
+        # 유형별로 동기화된 이용 특성 및 개선점 출력
+        alert_style(f"**진단 결과 귀하의 미디어 이용 패턴은 [{user_type}] 상태입니다.**")
         st.markdown(f"**📌 이용 특성:** {type_desc}")
         st.markdown(f"**💡 개선하면 좋은 점:** {improve_desc}")
 
